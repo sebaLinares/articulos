@@ -15,3 +15,5 @@ Por ahí escuché que si se lo puedes explicar a un niño de 5to básico, es por
 
 No, no hablaremos de psicología y de cómo un padre debería comunicarse con su hijo, hablaremos de la comunicación entre un componente padre 👨hacia un componente hijo 👦, y viceversa. Primero que todo: ¿Qué hace que un componente sea padre/hijo de otro?
 Al igual que la relación de Gohan con Goku — hijo y padre — , un componente que se instancia adentro de otro componente, podemos llamarlo componente hijo. Esta relación de “parentesco” les dará la habilidad de comunicarse y compartir propiedades o eventos siguiendo las buenas prácticas de Angular en relación a la separación de intereses.
+
+## Titulo
