@@ -23,6 +23,7 @@ base de datos, servicios u otros y debería ser a través de ellos que se repart
 ## Comunicación padre a hijo utilizando '@Input()' 👈
 Imaginemos que el componente **GohanComponent** quiere hacer un Kamehameha, pero no sabe cómo 🤔 ¿Quién le enseñará? Su padre, el componente **GokuComponent** a través de un decorador@Input() que permite traspasar datos desde el template — o desde el archivo .html — .
 
+
 > goku.component.ts
 ```ts
 @Component({
