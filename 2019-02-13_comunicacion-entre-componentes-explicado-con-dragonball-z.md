@@ -1,5 +1,5 @@
 # Comunicación entre componentes, explicado con Dragon Ball Z— Angular 7 — Parte 1.
-
+  
 ![goku-y-gohan](https://miro.medium.com/max/3840/1*mVzKRZkN3Sv2tXfYNknmEw.jpeg)
 
 Por ahí escuché que si se lo puedes explicar a un niño de 5to básico, es porque lo entiendes. Y qué hace un niño de 5to básico, pues ver **Dragon Ball Z** — bueno, al menos yo lo hacía — . Así que me valdré de Goku y sus amigos para explicar este pequeño fragmento del quehacer de nuestro querido framework **Angular**.
@@ -23,149 +23,51 @@ base de datos, servicios u otros y debería ser a través de ellos que se repart
 ## Comunicación padre a hijo utilizando '@Input()' 👈
 Imaginemos que el componente **GohanComponent** quiere hacer un Kamehameha, pero no sabe cómo 🤔 ¿Quién le enseñará? Su padre, el componente **GokuComponent** a través de un decorador@Input() que permite traspasar datos desde el template — o desde el archivo .html — .
 
+<script src="https://gist.github.com/sebaLinares/40f424d2c649a0a2277173cbbe139d9c.js"></script>
 
-> goku.component.ts
-```ts
-@Component({
-  selector: 'app-goku',
-  template: `
-  <div class="container">
-      <div class="row">
-        <div class="col-sm-8 offset-sm-2">
-            <h1 class="mx-4">Goku Component</h1>
-            <input 
-              class="mx-2 form-control"
-              #gokuInput
-              (keyup)="keyUp(gokuInput.value)">
-            <div class="col-sm-12">
-              <app-gohan [kamehamehaGohan]="kamehamehaGoku"></app-gohan>
-            </div>
-        </div>
-          
-      </div>
-    </div>
-  `,
-  styleUrls: ['./goku.component.css']
-})
-export class GokuComponent {
-
-  // Se declara e inicia en el componente padre para luego comunicarlo al componente hijo
-  kamehamehaGoku: string = '';
-
-  // con cada tecla apretada se activa esta funcion.
-  keyUp(letra: string) {
-    this.kamehamehaGoku = letra;
-  }
-
-  constructor() { }
-
-}
-```
-
-> gohan.component.ts
-```ts
-import { Component, Input } from '@angular/core';
-
-@Component({
-  selector: 'app-gohan',
-  template: `
-    <div class="gohanComp">
-      <h3>Gohan Comp</h3>
-      <p>Gohan ahora puede usar el <p>
-      <h1>{{kamehamehaGohan}}</h1>
-    </div>
-  `,
-  styleUrls: ['./gohan.component.css']
-})
-export class GohanComponent {
-
-  // Se recibe desde el padre. Ahora se puede utilizar en este componente
-  // Cualquier cambio en esta variable en 'app-goku', se reflejará acá
-  @Input() kamehamehaGohan: string;
-
-  constructor() { }
-
-}
-```
+<script src="https://gist.github.com/sebaLinares/e3f2253524111c5d681b99d33980b8b0.js"></script>
 
 Ahora Gohan puede utilizar el `kamehameha` cuando quiera, ya que su padre se lo ha enseñado (comunicado) 👌.
 
-![kamehameha](https://giphy.com/gifs/NPGWVCyKOwMzNBZnW0?utm_source=iframe&utm_medium=embed&utm_campaign=Embeds&utm_term=https%3A%2F%2Fcdn.embedly.com%2Fwidgets%2Fmedia.html%3Fsrc%3Dhttps%3A%2F%2Fgiphy.com%2Fembed%2FNPGWVCyKOwMzNBZnW0%2Ftwitter%2Fiframe&%3Burl=https%3A%2F%2Fgiphy.com%2Fgifs%2FNPGWVCyKOwMzNBZnW0&%3Bimage=https%3A%2F%2Fmedia.giphy.com%2Fmedia%2FNPGWVCyKOwMzNBZnW0%2Fgiphy.gif&%3Bkey=a19fcc184b9711e1b4764040d3dc5c07&%3Btype=text%2Fhtml&%3Bschema=giphy)
+<iframe src="https://giphy.com/embed/NPGWVCyKOwMzNBZnW0" width="480" height="250" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
 
 Ejemplo en [Stack Blitz](https://stackblitz.com/edit/goku-gohan) 👨💻
-
+  
+  
 ## Comunicación hijo a padre utilizando '@Output()' y '@EventEmitter()' 👈
 Tal como les mencioné, un componente padre — controlador — tiene la **lógica** de una función, pero es su componente hijo — presentador — quien debe enviar un aviso, para desencadenarla. Volvamos a 5to básico y a Dragon Ball Z 📺.
 Se acuerdan de la Genkidama? Bueno, esta técnica que salvo a la tierra 🌎 en incontables oportunidades solo la realizaba Gokú. Él, nuevamente, es nuestro **componente controlador**, tiene la lógica de la genkidama(){}. Como ya sabrán todos — porque los que no, ya hicieron click en el link y ahora saben lo que es una genkidama — para realiza está técnica se necesita la energía de todos los seres vivientes del universo — o todos los que quieran ayudar — . Para términos demostrativos, imaginemos que Gohan, nuevamente nuestro componente presentador, es el último en entregar su energía, con la cual se completaría la genkidama para que nuestro héroe Gokú, pueda hacer uso de ella y derrotar a <ingrese su villano favorito> 👹. Vamos con el código.
 
-> gohan-genkidama.component.ts
-```ts
-import { Component, Input, Output, EventEmitter  } from '@angular/core';
+<script src="https://gist.github.com/sebaLinares/f0990554bae744ed193c93c4c6a9fcca.js"></script>
 
-@Component({
-	selector: 'gohan',
-	template: `
-		<div class="gohanComp">
-		<button 
-			type="button" 
-			(click)="genkidamaAlerta(true)"
-			>Hacer genkidama</button>
-		</div>
-	`,
-	styleUrls: ['./gohan.component.css']
-})
-export class GohanComponent {
-	@Output() energiaGohan = new EventEmitter<boolean>();
-	constructor() { }
-        
-	genkidamaAlerta(msg: boolean){
-		this.energiaGohan.emit(msg)
-		console.log(msg);
-	}
-      
-}
-```
-
-> goku-genkidama.component.ts
-```ts
-import { Component  } from '@angular/core';
-
-@Component({
-    selector: 'goku',
-    template: `
-      <div class="container">
-   		  <div class="row">
-          <div class="col-sm-8 offset-sm-2">
-        		<gohan
-							(energiaGohan)="genkidamaLista("vent)">
-						</gohan>
-						<h1>Goku Component</h1>
-						<img src="{{genkidamaImg}}" alt="">
-					</div>
-				</div>
-			</div>
-		`,
-		styleUrls: ['./goku.component.css']
-})
-export class GokuComponent {
-	genkidama: boolean = false;
-	genkidamaImg: string;
-
-	constructor() { }
-
-	genkidamaLista(confirmation: boolean){
-	this.genkidama = confirmation;
-	console.log(this.genkidama);
-
-	//hacer genkidama si es true
-	if(this.genkidama){
-		this.genkidamaImg = 'https://vignette.wikia.nocookie.net/dragonball/images/6/6c/Goku_lanzando_la_Genkidama.png/revision/latest?cb=20130105194140&path-prefix=es'
-	}
-}
-```
+<script src="https://gist.github.com/sebaLinares/88a258d0f7b15039ca53f5f8ee685e1a.js"></script>
 
 Finalmente con la energía de `GohanComponent`, nuestro `GokuComponent` puede terminar la `genkidama` y está listo para salvar nuevamente el planeta 👏.
-![comunicacion hijo a padre
-gif](https://giphy.com/gifs/1zl0R62f0kqUJOqICe?utm_source=iframe&utm_medium=embed&utm_campaign=Embeds&utm_term=https%3A%2F%2Fcdn.embedly.com%2Fwidgets%2Fmedia.html%3Fsrc%3Dhttps%3A%2F%2Fgiphy.com%2Fembed%2F1zl0R62f0kqUJOqICe%2Ftwitter%2Fiframe&%3Burl=https%3A%2F%2Fgiphy.com%2Fgifs%2F1zl0R62f0kqUJOqICe&%3Bimage=https%3A%2F%2Fmedia.giphy.com%2Fmedia%2F1zl0R62f0kqUJOqICe%2Fgiphy.gif&%3Bkey=a19fcc184b9711e1b4764040d3dc5c07&%3Btype=text%2Fhtml&%3Bschema=giphy)
+
+<iframe src="https://giphy.com/embed/1zl0R62f0kqUJOqICe" width="480" height="352" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
 
 Ejemplo en [Stack Blitz](https://stackblitz.com/edit/gohan-goku) 👨💻
+
+## Comunicación entre componentes hermanos 👦 ← → 👦  
+  
+Para terminar y a modo de integración de lo aprendido hasta el momento. ¿Cómo solucionaríamos el problema de comunicación entre dos componentes del mismo nivel jerárquico?
+
+![comunicacion hijo - hijo](https://miro.medium.com/max/1224/1*PglXhaTxXwuZWbiGcTYOLA.jpeg)
+
+Vamos con Dragon Ball. Hubo un momento en la serie, en que Goku y Gohan (padre e hijo) estaban en el Planeta Sagrado y el único que de comunicaba con el planeta tierra, era Goku a través del Kaio Supremo. Imaginemos que Gohan quería comunicarle un mensaje a su hermano Goten. Gohan no puede hablarle directamente, debe hacerlo a través de Goku… ¿Cómo lo haría entonces? Vamos al código.
+
+<script src="https://gist.github.com/sebaLinares/c4661c162cb7029fae5af8194f3aa944.js"></script>
+
+<script src="https://gist.github.com/sebaLinares/293e8ba95042066ea03391787a4e5e43.js"></script>
+
+<script src="https://gist.github.com/sebaLinares/fd53bb8ef822a2d8ce79e8c6387dcd09.js"></script>
+
+<iframe src="https://giphy.com/embed/dJMK0wsFfIwngBDsDp" width="480" height="274" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+
+Ejemplo en [Stack Blitz](https://stackblitz.com/edit/angular-3xugow) 👨💻
+
+## Resumen
+La comunicación entre componentes es un contenido recurrente y me quise dar **el lujo** de explicar un tema que me apasiona con otro que me trae muy buenos recuerdos, **Angular** con **Dragon Ball Z**.
+Hemos puesto sobre la mesa las formas más comunes y básicas de la comunicación entre componentes de distinto nivel jerárquico. En una siguiente entrada ahondaremos en mecanismos más complejos de comunicación para casos un tanto más específicos. Espero les sirva, saludos!
+
+![goku](https://miro.medium.com/max/800/1*866pGDLtHjF-mZFjdr2AwA.jpeg)
