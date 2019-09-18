@@ -11,20 +11,20 @@
 En la entrada anterior tratamos 3 formas de comunicación diferentes para 3 tipos de relación entre componentes:
 
 1. Comunicación 👨padre → hijo 👦 mediante `Input()` — y el Kame Hame Ha.
-<iframe src="https://giphy.com/embed/NPGWVCyKOwMzNBZnW0" width="480" height="250" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>  
-  
+<iframe src="https://giphy.com/embed/NPGWVCyKOwMzNBZnW0" width="480" height="250" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+
 2. Comunicación 👦 hijo → padre👨 mediante `Output()` y `EventEmitter()` — y la Genkidama.
-<iframe src="https://giphy.com/embed/1zl0R62f0kqUJOqICe" width="480" height="352" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>  
+<iframe src="https://giphy.com/embed/1zl0R62f0kqUJOqICe" width="480" height="352" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
 
 3. Comunicación entre componentes hermanos 👦 ←→👦 mediante `Input()` `Output()` y `EventEmitter()`
-<iframe src="https://giphy.com/embed/dJMK0wsFfIwngBDsDp" width="480" height="274" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/dJMK0wsFfIwngBDsDp">via GIPHY</a></p>  
+<iframe src="https://giphy.com/embed/dJMK0wsFfIwngBDsDp" width="480" height="274" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/dJMK0wsFfIwngBDsDp">via GIPHY</a></p>
 
 Esas formas de comunicación pueden **resultar muy útiles** y seguir todas las recomendaciones y **buenas prácticas de Angular**, pero **no siempre son** suficientes para la idea que tenemos en mente o el problema del que necesitamos salir.
-Para eso les traigo, en mi opinión, la forma más fácil y rápida, y la que uso en mis desarrollos.  
+Para eso les traigo, en mi opinión, la forma más fácil y rápida, y la que uso en mis desarrollos.
 
 ## Comunicación entre dos componentes sin parentesco 👲 ← →👳
 
-![goku gritando a vegeta](https://miro.medium.com/max/1000/1*gZUZ14o03phn8K-YCLMIUA.jpeg)  
+![goku gritando a vegeta](https://miro.medium.com/max/1000/1*gZUZ14o03phn8K-YCLMIUA.jpeg)
 
 No era raro ver a Vegeta discutiendo con Goku, molesto 😠 por algo o evitándolo a toda costa. Si fuera por él, quizás ni dirigirle la palabra directamente. Imaginemos que a su vez, Goku también estaba molesto con Vegeta y ambos no querían hablarse directamente. ¿Cómo se comunicarían entonces estos dos grandes personajes de la serie? A través de Bulma. Este es el ejemplo que utilizaremos para explicar el concepto de la **comunicación a través de un servicio y el uso del BehaviorSubject**, los cuales explicaré brevemente a continuación.
 
@@ -32,7 +32,7 @@ No era raro ver a Vegeta discutiendo con Goku, molesto 😠 por algo o evitándo
 
 Cuando Goku quiera comunicarse con Vegeta — y viceversa, tendrán que ir a la casa de Bulma y comunicarle un mensaje ✉️ para Vegeta. Como a Bulma no le gusta ser entrometida, ella solo entregará el mensaje ✉️ cuando Vegeta se lo pida.
 
-En este ejemplo tenemos:  
+En este ejemplo tenemos:
 
 1. Goku → Observer
 2. Vegeta → Observer
@@ -91,11 +91,49 @@ Luego podría llamarles la atención el `<input>` en el que hay un `#msg`. Esto 
   <label>Mensaje para Vegeta:</label>
   <input class="form-control" #msg type="text">
 </div>
-<button 
+<button
   class="btn btn-primary" type="button"
   (click)="enviarMensaje(msg.value)" // Aquí usamos el #msg
   >Enviar Mensaje
 </button>
 ```
 
+Continuando, **para enviar un mensaje** ✉️, tenemos una función `enviarMensaje(mensajeGoku)` o `enviarMensaje(mensajeVegeta)`, estas funciones se desencadenan en el `<button (click)="enviarMensaje(msg.value)"></button>` luego del `<input>`. El parámetro `mensajeGoku` o `mensajeVegeta` va a ser el `msg.value` que les enseñe en el párrafo anterior. Para eso sirven las **variable de referencia del template** — junto con otras cosas. ¿Qué hacemos con este mensaje? Enviarlo a nuestro **BehaviorSubject** que esta en **CasaBulmaService**. En nuestro servicio teníamos una función que almacenaba los mensajes llamada `enviar()`. Esta función espera un argumento, que será el mensaje ✉️ a almacenar.
 
+```
+enviarMensaje(mensajeGoku){
+  this.casaBulmaService.enviar(mensajeGoku);
+}
+```
+Finalmente, para ver el último mensaje que se envío, está la función `verMensaje()`. Aquí hay que poner mucha atención, porque es aquí donde aplica aquello que les mencioné, acerca de que no se debía llamar a un BehaviorSubject directamente, sino que, se debía hacer a través de un Observable. Si se fijan, llamo al servicio y al observable `bulma$` de dicho servicio. No basta con eso, para que un observable emita (muestre) que tiene almacenado, debemos suscribirnos a su respuesta. En este caso yo use esa respuesta y la asigne a una variable que luego la mostré en el template a través de una [interpolación](https://angular.io/guide/template-syntax#interpolation-).
+
+Y para ahondar un poco más en la función, si se fijan, antes de suscribirme al observable `bulma$`, hay algo llamado `pipe`. ¿Qué es un pipe? Utilizamos `.pipe` cuando queremos utilizar diferentes operadores que nos facilita RxJS. Estos operadores son varios y tienen diferentes funciones, los invito a leer la [documentación](https://www.learnrxjs.io/operators/filtering/take.html) para ahondar más en ellos — son muy útiles. Bueno, pero este operator `take`, nos permite solo tomar el último valor que se le entrego al **Observable**, si no estuviera, cada vez que hacemos click en el botón de ver mensaje — de cualquiera de los componentes — veríamos que se muestra el mensaje en ambos componentes, no solo en el que se hizo click. Esto sucede porque, recuerdan el concepto que les mencione de “suscribirse”, bueno una vez que se suscriben, valga la redundancia, quedan suscritos. Es algo parecido a la listas de mail, si no nos desuscribimos, siempre seguiremos recibiendo los mails, aunque no queramos — aunque a veces ni con desuscribirnos basta. Con el `take` nos “desuscribimos” del bservable, luego de leer el mensaje que nos interesa. Pueden hacer la prueba, en este proyecto [StackBlitz](https://stackblitz.com/edit/behaviorsubject-medium) que les hice y borren el pipe dejando solo el subscribe, a ver qué sucede cuando hacen click en el botón “Ver mensaje de ..”, después del segundo mensaje enviado — el primero siempre va a funcionar, porque no hay nada antes de él.
+
+```
+verMensaje() {
+  this.casaBulmaService.bulma$.pipe(take(1))
+    .subscribe(mensaje => this.mensajeVegeta = mensaje);
+}
+// Y si quieren probar lo que les dije cambien la funcion por esto
+// en el proyecto de StackBlitz
+verMensaje() {
+  this.casaBulmaService.bulma$.subscribe(mensaje => this.mensajeVegeta = mensaje);
+}
+```
+
+### Conceptos que deberían ahondar
+
+1. [Servicios de Angular](https://angular.io/guide/architecture-services<Paste>).
+2. [Observables](https://angular.io/guide/observables).
+3. [BehaviorSubject](https://www.learnrxjs.io/subjects/behaviorsubject.html).
+4. [Operadores en RxJS](https://www.learnrxjs.io/operators/).
+
+### Para concluir ...
+Cuando desarrollemos una aplicación en **Angular**, tendremos muchos obstáculos y uno de los primeros que se nos presenta, es el de cómo hacer que X componente se comunique con Y componente, teniendo cada uno de estos muchos tipos de relaciones. El objetivo de esta serie de entradas (2), fue que, de manera simple, para desarrolladores de todos los niveles, aprendieran o refrescaran sus conocimientos en esta tarea. Creo que las analogías con series animadas o reales y sus personajes son una
+tremenda herramienta, al momento de explicar un concepto o un tema. Así que me valí de eso para explicar estos conceptos tan utilizados en el quehacer del desarrollo con **Angular**, y pretendo seguir haciéndolo.
+
+Espero sirva || haya servido,
+
+Saludos!
+
+![Goku-nube](https://miro.medium.com/max/1000/1*Bpud6kka2ZFNXuKfe1Icyw.gif)
