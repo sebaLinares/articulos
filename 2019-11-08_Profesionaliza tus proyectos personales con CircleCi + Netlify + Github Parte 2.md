@@ -1,4 +1,4 @@
-# Upgrading Your Personal Project Game With CircleCi + Netlify + Github - Part 2
+# Profesionaliza tus proyectos personales con CircleCI + Netlify + Github Parte 2
 
 This is the continuation of my [last post](https://dev.to/sebalinares/upgrading-your-personal-project-game-with-circleci-circleci-netlify-github-part-1-eng-5bp2) on this series about *upgrading your personal project game*. In this edition, we'll finish implementing the CD in CI/CD - continuous delivery. 
 
