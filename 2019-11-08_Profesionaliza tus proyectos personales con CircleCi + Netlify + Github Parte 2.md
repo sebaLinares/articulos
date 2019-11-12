@@ -1,87 +1,87 @@
 # Profesionaliza tus proyectos personales con CircleCI + Netlify + Github Parte 2
 
-This is the continuation of my [last post](https://dev.to/sebalinares/upgrading-your-personal-project-game-with-circleci-circleci-netlify-github-part-1-eng-5bp2) on this series about *upgrading your personal project game*. In this edition, we'll finish implementing the CD in CI/CD - continuous delivery. 
+Está es la continuación de mi post [post anterior](https://dev.to/sebalinares/upgrading-your-personal-project-game-with-circleci-circleci-netlify-github-part-1-eng-5bp2). Esta vez, concluiremos esta serie con la implementación del CD en CI/CD - Continuous Delivery. 
 
-## End result 🔚
-* A project hosted on Netlify (free tier)
-* A new `config.yml` CircleCI configuration file.
-* A workflow on CircleCI that will allow you to deploy on every merge of a pull request to your `master branch` 
+## Resultado 🔚
+* Un proyecto alojado en Netlify (free tier)
+* Un nuevo archivo de configuración CircleCI `config.yml`
+* Un flujo de trabajo en CircleCI que nos permitirá hacer *deploy* cada vez que hagamos *merge* a un pull request de nuestra `master branch`. 
 
 ## Continuous Delivery (CD) 🤝
-In this edition I'm not resorting to Microsoft docs, but to [continuousdelivery.com](www.continuousdelivery.com), which says:
-> Continuous Delivery is the ability to get changes of all types—including new features, configuration changes, bug fixes, and experiments—into production, or into the hands of users, safely and quickly in a sustainable way.
+En esta edición no recurriré a la documentación de Microsoft, si no que a la de [continuousdelivery.com](www.continuousdelivery.com), que dice: 
+> Continuous Delivery es la habilidad de obtener los cambios de todo tipo, incluyendo las nuevas características, cambios de configuración, bug fixes y experimentos, a producción o a las manos de los usuarios, de una manera segura, rápida y sostenible.
 
-Pretty straightforward. In the last post, we talked about the integration, an instance for thorough testing - you wish -, the last revision to be sure that the changes you just made to your app won't break the end product that the user receives. Now it's all about ensuring that your user gets that new app in the quickest and seamlessly way 🏃‍♂️.
+Una definición bastante completa. En el último post, hablamos acerca de la integración. Una instancia para un testing completo - nos gustaría -, el último checkeo para estar seguros que los cambios que hicimos a nuestra aplicación no romperán el producto final. Ahora - en el continuous delivery -, es tiempo de asegurar que nuestro usuario final reciba la aplicación de la manera más rápida e integra🏃‍♂️.
 ![like-a-boss](https://media.giphy.com/media/l0IykI5OLMhjtnB60/giphy.gif)
 
-## First Step 1️⃣: Create a Netlify account
-1. Enter [this link](https://app.netlify.com/signup/email) and create an account.
-2. When you finish registering you'll be redirected to your dashboard, which will be empty. Click in "New site from Git".  
+## Primer paso 1️⃣: Crear una cuenta en Netlify
+1. Entramos [este link](https://app.netlify.com/signup/email) y creamos una cuenta.
+2. Una vez que terminemos de registrarnos, seremos redirigidos a nuestro panel de control, el cual estará vacío. Hacemos click en *New site from Git*
 ![new-site](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/new-site.jpg)  
-3. Click on Github and enter your credentials 🔐.  
+3. Click en Github e ingresamos nuestras credenciales 🔐  
 ![github-credentials](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/github-credentials.jpg)  
  
-4. You'll be prompted with a Netlify installation 🔧 that needs to be done on Github. 
-5. You have two options here, allow Netlify app to peak in all your projects or only on the selected ones. I'll choose the latter, only allow it on the project that we created in the last post.  
+4. Aparecerá una solicitud de instalación 🔧 que necesita hacerse en Github 
+5. Tenemos dos opciones aquí: permitir que Netlify tenga acceso a todos nuestros proyectos o solamente a los que escojamos. Elegiremos la última y solo permitiremos que Netlify vea la aplicación que creamos en el último post.  
 ![install-netlify](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/install-netlify.jpg)  
 
-6. Click install and write your password 🔑 .
-7. In the next window click again in the name of your Github Project.
-8. Now you get to a form where you can set the build options of your repository. I'll leave this as it is because it is just how I need it to be for the next steps.  
+6. Hacemos click en `Install` e ingresamos nuestra clave 🔑 .
+7. En la ventana siguiente, hacemos click nuevamente en el nombre de nuestro proyecto de Github
+8. Ahora veremos un formulario donde podemos configurar nuestras *build options* para el proyecto. Lo dejaremos como está, porque así tal cual es como lo necesitamos para los siguientes pasos.
 ![deploy-settings.jpg](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/deploy-settings.jpg)  
   
-9. Click in *Deploy Site*
+9. Hagamos click en *Deploy Site*
 
-If you followed are following this series everything should work and in a phew seconds your project should have built. Below your projects name, there should be a link with a `.netlify.com` extension. If you click it, you will be redirected to your live website!
+Si están siguiendo esta serie de posts, todo debería funcional y en un par de segundos su proyecto deberá haberse generado. Abajo del nombre de su proyecto, debería haber un link con una extensión `.netlify.com`. Si le hacemos click seremos redirigidos a nuestro nuevo sitio web!
 ![awesome](https://media.giphy.com/media/3ohzdIuqJoo8QdKlnW/giphy.gif)
 
-If your site wasn't deployed 🙅🏽‍♂️ I have some guesses in what could have happened :  
+Si el sitio no fue creado 🙅🏽‍♂️, sugiero estos posibles escenarios.
 
-* Your project was built with npm and in the 8th step it was set to use `yarn build`. You just need to go to `settings > build & deploy > edit settings`. There you can modify your `build command` to use npm.
-* Maybe you gave Netlify permission to another repository. To check which repository your Netlify project is linked to, go to `setting` and click below your app url where it says `Github`. That link will redirect you to the repository of this particular build.
+* Su proyecto fue creado con NPM y en el 8vo paso, lo configuramos para usarse con `yarn build`. Solo tenemos que ir a `settings > build & deploy > edit settings`. Ahí podremos modificar nuestro `build command` para usar NPM.
+* Quizás a Netlify le dimos permisos para otro repositorio. Para revisar que repositorio está conectado con nuestra cuenta Netlify, vayamos a `setting` y abajo de la url, hacemos click donde dice `Github`. Ese link nos redireccionara al repositorio en conexión. 
 
-## Add a build Hook to your Netlify configuration
+## Agregar un build Hook a nuestra configuración de Netlify
 
-In simple words, the build hook is an endpoint. If you send an empty `POST` request to it, you unleash a build + deploy of the target branch - master in this case.  
+En simples palabras, el build hook **es un endpoint**. Si enviamos un `POST` request vacío, desencadenaríamos el proceso de `build` + `deploy` de la rama master de nuestro repositorio.
 ![unleash-the-beast-gif](https://media.giphy.com/media/5xaOcLE3ZnWJhT2IYCY/giphy.gif)
 
-1. Go to `settings > build & deploy` and scroll down to `build hooks`.  
+1. Vayamos a `settings > build & deploy` y bajemos hasta `build hooks`.  
 ![build-hook-1](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/build-hook-1.jpg)  
   
-2. Click in `Add build Hook`  
+2. Hacemos click en `Add build Hook`  
 ![build-hook-2](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/build-hook-2.jpg)  
  
-3. Write a descriptive name to your build and save it.
-4. Copy the url that was generated on save. Paste it somewhere because we'll need it later.  
+3. Le asignamos un nombre descriptivo y guardamos.
+4. Copíamos la url que se generó. Peguémosla en algún lugar porque la necesitaremos más tarde.
 ![build-hook-end](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/build-hook-end.jpg) 
 
 
-## Configure an environment variable in CircleCI
-So now we have a url that serves us as an endpoint to trigger our build + deploy. We are going to use it in our CircleCi configuration file `config.yml`. But as the good developers that you are, I imagine you don't want to put that same `url` in the public github repository `config.yml` file, no? 🤔 For that, we are going to use the environment variables that the people from CircleCI were kind enough to provide us. 
+## Configurar una environment variable en CircleCI
+Ya tenemos una url que sirve como un endpoint para desencadenar nuestro *build + deploy*. Ahora vamos a usar eso en nuestro archivo de configuración de CircleCI `config.yml`. Pero como buenos desarrolladores que somos, me imagino que no queremos que esa `url` quedé pública en nuestro repositorio de Github 🤔 - cualquiera podría gatillar un deploy simplemente enviando un POST a esa url. Para esto, tenemos variables de ambiente que los amables trabajadores de CircleCi nos han provisto.
 
-1. Go to your CircleCI app.
-2. Click in `Jobs`. 
-3. Click in the settings icon next to your project's name.  
+1. Vayamos a nuestra app de CircleCI
+2. Hacemos click en `Jobs`
+3. Hagamos click en el ícono de configuración que está al lado del nombre de nuestro proyecto  
 ![job-settings](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/job-settings.jpg)  
 
-4. We entered the settings of that specific `Job`. Click where it says `Environment Variables`.  
-5. Click in `Add Variable`  
+4. Nos encontramos dentro de la configuración específica para ese `Job`. Hacemos click donde dice `Environment Variables`
+5. Ahora click en `Add Variable`  
 ![environment-variables-circleci](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/environment-variables-circleci.jpg) 
-6. We'll give it a descriptive name like `awesome_endpoint` and in the `value` paste that endpoint url I told you to save previously.
-7. Click in `Add Variable` again.  
+6. Le daremos un nombre descriptivo - `awesome_endpoint` -, y en el `value` pegamos el endpoint que guardamos anteriormente - la url del build hook de netlify
+7. Hagamos click en `Add Variable` nuevamente
 ![add-environment-variable](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/add-environment-variable.jpg) 
 
 
-Almost done, one step more!
+Casi listos, solo un paso más!
 
-## Change CircleCI configuration
-In our last `config.yml` file we only ran a set of tests. Now the goals are to test only in your `feature branch` and only deploy when your master branch merges a `pull request`.
+## Cambiar la configuración de CircleCI 
+En nuestro último archivo `config.yml` solo ejecutamos un set de test. Ahora el objectivo es testear solo en nuestra `feature branch` y únicamente hacer `deploy` cuando hacemos *merge* de una *pull request* hacia nuestra rama master.
 
-FIRST: be sure to be in a `feature branch`, NOT your `master` 🙏🏽. If you look at the `config.yml` file. You'll see the word `jobs`. Below this, we can only see one `job`, `build`. We are going to add a second job, we'll name it `deploy`.
+PRIMERO: Asegurémonos de estar en la `feature branch`, no en la `master` 🙏🏽. Si vemos el archivo `config.yml`, veremos la palabra `jobs`. Abajo de esto, solo veremos un `job`, `build`. Ahora agregaremos un segundo job, lo llamaremos `deploy`
 
-In this `job` we'll specify a machine to work on, in this case I chose a `macos` one. Then, remember the url we were given in our `build hook` 🧠, now it's time to use it - think it this way: Netlify calls the specified `command` in an environment that runs a `macos` virtual machine. 
+En este `job` especificaremos en qué máquina queremos trabajar. En este caso elijamos una `macos`. Luego recuerdan la url que nos dieron en nuestro `build hook` 🧠, la usaremos nuevamente. 
 
-Your new job will look like this.
+Su nuevo `job` debería verse así.
 
 ```yml
 deploy:
@@ -93,9 +93,9 @@ deploy:
           command: curl -X POST -d {} ${awesome_endpoint}
 ```
 
-As you imagine, behind that `${awesome_endpoint}` hides the environment variable with the secret endpoint that triggers our project 👀. 
+Cómo pueden imaginar, detrás de `${awesome_endpoint}` se esconde nuestra variable de ambiente con el endpoint secreto que gatilla el *build + deploy* del proyecto. 
 
-Now we have two CircleCi `jobs`, build & deploy. How to join them? With `workflows`. We can schedule jobs to run in certain conditions we previously configured. More information [here in the docs](https://circleci.com/docs/2.0/workflows/).
+Ahora tenemos dos `jobs`, build & deploy. Como los unimos? Con `workflows`. Podemos agendar los `jobs` que queremos que se gatillen ante ciertas condiciones que previamente configuraremos. Más información [aquí en la documentación](https://circleci.com/docs/2.0/workflows/).
 
 ```yml
 workflows:
@@ -112,9 +112,9 @@ workflows:
               only: master
 ```
 
-First, we declare at top-level the `workflows` keyword. Then, we write each job we want to run and filter each one by `branches`. The `build` job ignores master branch, so it runs on any other branch - very useful if our `feature branches` will have various names. On the other hand, the `deploy` job clearly stipulates that it will run **only** in the `master` branch. Like we talked before, we are only thinking in a suite of tests in our feature branch before merging and only deploy our `master` branch.
+Primero, declaramos la palabra clave `workflows`. Luego, escribimos cada `job` que queremos ejecutar y filtramos cada uno por `branches`. El `build` job ignora la `master branch`, por lo tanto se ejecuta en cualquier otra rama. Por otro lado, el job `deploy` estipula que se ejecutará **solo** en la rama `master`. Tal como lo hablamos anteriormente, estamos pensando en hacer el testing en la `feature branch` y luego solo hacer `deploy` en `master`.
 
-Your final `config.yml` should now look like this:
+Nuestro archivo final `config.yml` debería terminar viéndose así:
 
 ```yml
 version: 2
@@ -164,25 +164,25 @@ workflows:
 
 ```
 
-## Commit changes and push the feature branch
-The only changes we did in this repository's code was in the `config.yml` file. Add it and push it to your remote repository with `git add .circleci/config.yml && git commit -m 'circleci: add deploy job and workflow' && git push origin <branch_name>`
+## Hacer commit de los cambios y push a la feature branch 
+El único cambio que hicimos en el código del repositorio fue en el archivo `config.yml`. Lo agregamos y hacemos push a nuestro remoto con `git add .circleci/config.yml && git commit -m 'circleci: add deploy job and workflow' && git push origin <branch_name>`
 
-Create a pull request as we saw in the last post. 
+Creamos un pull request como vimos en el post anterior.
 
-### Here is where everything we've done in these 2 posts shines.
-First, you'll have to wait for the checks to complete. Specifically, the `build` job that we configured to the master branch as `protection`. If this doesn't complete successfully we aren't going to be able to merge.
+### Ahora se ven los resultados de todo lo que hemos hecho en los últimos dos posts. 
+Primero, tenemos que esperar que los *checks* se completen. Específicamente el job `build` que es el que configuramos en nuestra `master branch` como protección. Si no se completa exitosamente, no podremos hacer **merge*
 ![github-merging](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/github-merging.jpg)  
 
-Meanwhile you wait, on the CircleCI website the `build` is running.   
+Mientras esperamos, en CircleCI nuestro `build` esta corriendo   
 ![feature-branch-circleci-job-success](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/feature-branch-circleci-job-success.jpg)  
 
-After we merge the pull request, the `deploy` job runs on the master branch.  
+Luego de haber hecho *merge* del pull request, el job `deploy` se ejecuta en nuestra `master branch`
 ![master-branch-circleci-build-running](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/master-branch-circleci-build-running.jpg)  
 
-When completed, it triggers the `build hook` from Netlify - the one we wrote in the environment variable on the CircleCI website. This triggers a build + deploy to our Netlify site - the one with the `.netlify.com` extension.
+Cuando se completa, se gatilla el `build hook` de Netlify - el que declaramos en la variable de ambiente de CircleCI. Esto gatilla un build + deploy en nuestro sitio de Netlify - el con la `.netlify.com` extension.
 ![netlify-building-in-process](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/netlify-building-in-process.jpg)  
 
-Finally, after Netlify's build succeeds our site is live  
+Finalmente, luego de que la *build* de Netlify es exitosa, nuestro sitio web está listo!
 ![netlify-deploy-success](https://raw.githubusercontent.com/sebaLinares/screenshots/master/blog-posts/ci-cd-blog/netlify-deploy-success.jpg)  
 
 **DONE**.
@@ -190,12 +190,12 @@ Finally, after Netlify's build succeeds our site is live
 ![yes!](https://media.giphy.com/media/DffShiJ47fPqM/giphy.gif)
 
 
-## Last words  
-This ends our journey. You are now the proud owner of a project that tests and deploys automatically. Feel proud and you are allowed to overkill each one of your projects with these awesome features. Believe in your development game. You rock. 
+## Últimas palabras
+Esto concluye nuestro viaje. Ahora son los modestos dueños de un proyecto que hace testing y deploy automático. Siéntanse orgullosos y pueden hacerle el `overkill` que quieran con lo aprendido, hasta a sus proyecto más sencillos. Crean en sus proyectos, son geniales.
 
-Best wishes.
+Saludos!
 
 ![self-claps](https://media.giphy.com/media/gdkVL0ljDHbNcXQOZD/giphy.gif)
 
 ## Further information
-[CircleCI documentation](https://circleci.com/docs/) can give you a deeper understanding of the usage of this platform.
+La [documentación de CircleCI](https://circleci.com/docs/) puede darle sun mayor entendimiento de como usar la plataforma.
