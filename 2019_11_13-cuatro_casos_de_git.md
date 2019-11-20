@@ -1,3 +1,3 @@
-# Cuatro casos de uso con GIT
+# Four GIT use cases
 
-Para comenzar
+## 1st: Merge or Rebase ?
