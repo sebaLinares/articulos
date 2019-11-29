@@ -26,5 +26,5 @@ This shows us that beautiful graph that when you start understanding your like w
 
 I'll translate. Each `*` is a commit and each commit has a `SHA-1` - e.g `eb2f013`. This tells you that you - **HEAD** - are standing in `master` branch and you have the commit with the `65d57d6` sha-1, BUT that the **history** of this branch, diverges from the remote upstream branch of your local `master` branch - that is `origin/master`. Imagine that each one of those `|` is a path, can you see two paths? One points to `origin/master` and the other to `master`. 
 
-# b
+# Tip 
 
